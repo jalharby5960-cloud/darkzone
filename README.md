@@ -1,31 +1,28 @@
-# DARKZONE — مشروع موقع مجتمع عام
+# DARKZONE Community
 
-هذا مشروع ويب كامل كبداية عملية: حسابات مستخدمين، تسجيل دخول وخروج، قاعدة بيانات SQLite، ونشر منشورات عامة. المحتوى مخصص لمجتمع عام آمن، وليس منصة إباحية.
+Arabic RTL community site built with Express, SQLite, sessions, and a responsive frontend.
 
-## التشغيل على جهازك
-1. ثبّت Node.js 20 أو أحدث.
-2. فك ضغط المشروع وافتح مجلده في Terminal.
-3. نفّذ:
-   ```bash
-   npm install
-   ```
-4. انسخ `.env.example` إلى `.env` وغيّر `SESSION_SECRET` إلى قيمة طويلة وعشوائية.
-5. شغّل:
-   ```bash
-   npm start
-   ```
-6. افتح `http://localhost:3000` في المتصفح.
+## Features
+- Account registration, login, logout
+- Member profiles and editable bio
+- Community posts and category filtering/search
+- Likes and comments
+- User reports
+- Admin dashboard, report review, post deletion, announcement pinning
+- Basic rate limiting and password hashing
 
-## النشر على الإنترنت
-ارفع المجلد إلى مستودع Git، ثم اربطه بمنصة استضافة Node.js تدعم تطبيقات Express.
+## Run locally
+1. Install Node.js 22 or newer.
+2. Run `npm install`.
+3. Set `SESSION_SECRET` to a long random secret.
+4. Optionally set `ADMIN_EMAIL` to the email that should receive admin privileges.
+5. Run `npm start`.
+
+## Render deployment
 - Build command: `npm install`
 - Start command: `npm start`
-- Environment variables: `NODE_ENV=production`, `SESSION_SECRET` (قيمة طويلة وعشوائية).
-- اربط قرص تخزين دائم بمجلد `data` حتى لا تضيع قاعدة SQLite عند إعادة تشغيل الخدمة.
-- فعّل HTTPS من منصة الاستضافة.
+- Set environment variables: `SESSION_SECRET` (required), `ADMIN_EMAIL` (recommended).
+- Attach a persistent disk and set `DATA_DIR` to its mount path (for example `/var/data`) so SQLite data survives restarts/redeploys. Without a persistent disk, local SQLite data may be lost when the service is replaced.
 
-## ملاحظات مهمة قبل إطلاقه للجمهور
-- هذا إصدار تأسيسي، وليس منتجاً تجارياً مدققاً أمنياً.
-- تخزين الجلسات الافتراضي في Express MemoryStore مناسب للتجربة فقط؛ استبدله بمخزن جلسات دائم عند النشر.
-- أضف سياسة خصوصية وشروط استخدام وآلية بلاغات/إشراف قبل فتح التسجيل للجمهور.
-- لا تجمع بيانات حساسة لا تحتاجها، ولا تستخدم بيانات حقيقية في الاختبار.
+## Important production note
+For a public production service, configure a persistent disk and review session storage, backups, moderation, and privacy policies. The default Express session MemoryStore is not intended for production scale.
