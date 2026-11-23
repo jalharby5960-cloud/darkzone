@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#09090d"><title>DARKZONE — مجتمعك</title>
+<style>
+:root{--bg:#09090d;--panel:#14141d;--line:#292936;--txt:#f5f5f8;--muted:#a0a0ad;--red:#f04455}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#38121d 0,transparent 35%),var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+header{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 max(5%,calc((100% - 1100px)/2));border-bottom:1px solid #ffffff15;background:#09090de8;position:sticky;top:0;z-index:2;backdrop-filter:blur(12px)}
+.logo{font-weight:950;font-size:22px;letter-spacing:1px}.logo span{color:var(--red)}button{font:inherit;cursor:pointer;border:0;border-radius:11px;padding:11px 17px;font-weight:750}.primary{background:linear-gradient(130deg,#f04455,#a9142b);color:white}.ghost{background:#ffffff0b;color:white;border:1px solid var(--line)}
+main{width:min(1000px,90%);margin:42px auto}.hero{padding:35px 0 30px}.badge{color:#ff8792;background:#f0445518;border:1px solid #f044553b;padding:7px 12px;border-radius:30px;font-size:13px;display:inline-block}
+h1{font-size:clamp(36px,6vw,58px);line-height:1.15;margin:18px 0}h1 span{color:var(--red)}p{color:var(--muted);line-height:1.8}.row{display:flex;gap:12px;flex-wrap:wrap}.panel{background:linear-gradient(150deg,#191922,#111117);border:1px solid var(--line);border-radius:18px;padding:22px;margin:18px 0}
+h2{font-size:22px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}.feed{display:grid;gap:12px}.post{background:#0d0d13;border:1px solid #282833;border-radius:14px;padding:16px}.posthead{display:flex;justify-content:space-between;gap:12px}.post p{white-space:pre-wrap;margin:10px 0 0;color:#eee}.field,textarea{width:100%;background:#0b0b11;color:white;border:1px solid var(--line);border-radius:11px;padding:13px;margin:7px 0;font:inherit;outline:none}.field:focus,textarea:focus{border-color:var(--red)}textarea{resize:vertical;min-height:90px}.hidden{display:none!important}.modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;padding:16px;z-index:5}.modal.show{display:grid}.dialog{width:min(430px,100%);background:#15151e;border:1px solid var(--line);border-radius:20px;padding:24px}.dialog h2{margin-bottom:4px}.dialog .row>*{flex:1}.error{color:#ff8b96;font-size:13px;min-height:20px}.success{color:#86e0a4;font-size:13px;min-height:20px}footer{text-align:center;color:#777786;border-top:1px solid #ffffff15;padding:25px;font-size:13px}
+@media(max-width:600px){header{padding:0 5%}.hero{padding-top:20px}main{margin-top:25px}.panel{padding:17px}}
+</style>
+</head>
+<body>
+<header><div class="logo">DARK<span>ZONE</span></div><div class="row"><button class="ghost" id="loginOpen">دخول</button><button class="primary" id="signupOpen">إنشاء حساب</button></div></header>
+<main>
+<section class="hero"><span class="badge">✦ مجتمع رقمي آمن</span><h1>مساحتك، <span>مجتمعك.</span></h1><p>شارك أفكارك وتابع آخر المنشورات وتواصل مع مجتمعك من واجهة بسيطة وسريعة.</p></section>
+<section class="panel hidden" id="welcome"><div class="posthead"><div><h2 id="welcomeTitle">أهلاً!</h2><div class="muted">أنت مسجل الدخول الآن.</div></div><button class="ghost" id="logout">تسجيل الخروج</button></div></section>
+<section class="panel hidden" id="composer"><h2>اكتب منشوراً</h2><textarea id="postBody" maxlength="500" placeholder="وش حاب تشارك المجتمع؟"></textarea><div class="row"><button class="primary" id="publish">نشر المنشور</button><span class="muted" id="counter">0 / 500</span></div><div class="error" id="postError"></div></section>
+<section class="panel"><div class="posthead"><div><h2>آخر المنشورات</h2><div class="muted">منشورات المجتمع العامة</div></div><button class="ghost" id="refresh">تحديث ↻</button></div><div class="feed" id="feed"><p>جارٍ تحميل المنشورات...</p></div></section>
+</main>
+<footer>© 2026 DARKZONE · مجتمع عام · كن محترماً ولا تشارك معلوماتك الخاصة.</footer>
+<div class="modal" id="authModal"><div class="dialog"><h2 id="modalTitle">تسجيل الدخول</h2><p id="modalHint">ادخل إلى حسابك.</p><form id="authForm"><div id="usernameWrap" class="hidden"><input class="field" id="username" placeholder="اسم المستخدم" autocomplete="username"></div><input class="field" id="email" type="email" placeholder="البريد الإلكتروني" required autocomplete="email"><input class="field" id="password" type="password" placeholder="كلمة المرور (10 أحرف على الأقل)" required autocomplete="current-password"><div class="error" id="authError"></div><div class="row"><button class="primary" id="authSubmit">دخول</button><button type="button" class="ghost" id="closeModal">إغلاق</button></div></form><p class="muted" style="font-size:12px">لا تستخدم كلمة مرورك في مواقع أخرى. احمِ بياناتك ولا تشارك معلوماتك الشخصية.</p></div></div>
+<script>
+const $=id=>document.getElementById(id);let mode="login";
+async function api(url,opts={}){const r=await fetch(url,{headers:{"Content-Type":"application/json"},...opts});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||"تعذر إكمال الطلب.");return data}
+function modal(m){mode=m;$("modalTitle").textContent=m==="login"?"تسجيل الدخول":"إنشاء حساب";$("modalHint").textContent=m==="login"?"ادخل إلى حسابك.":"أنشئ حساباً جديداً للمشاركة."; $("usernameWrap").classList.toggle("hidden",m!=="register");$("password").autocomplete(m==="login"?"current-password":"new-password");$("authSubmit").textContent=m==="login"?"دخول":"إنشاء حساب";$("authError").textContent="";$("authModal").classList.add("show")}
+function close(){ $("authModal").classList.remove("show") }
+async function refreshUser(){const {user}=await api("/api/me");$("welcome").classList.toggle("hidden",!user);$("composer").classList.toggle("hidden",!user);$("loginOpen").classList.toggle("hidden",!!user);$("signupOpen").classList.toggle("hidden",!!user);if(user)$("welcomeTitle").textContent="أهلاً، "+user.username}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function loadPosts(){const {posts}=await api("/api/posts");$("feed").innerHTML=posts.length?posts.map(p=>`<article class="post"><div class="posthead"><strong>${esc(p.username)}</strong><span class="muted">${new Date(p.created_at+"Z").toLocaleString("ar-SA")}</span></div><p>${esc(p.body)}</p></article>`).join(""):"<p>ما فيه منشورات حالياً. كن أول من يشارك!</p>"}
+$("loginOpen").onclick=()=>modal("login");$("signupOpen").onclick=()=>modal("register");$("closeModal").onclick=close;$("authModal").onclick=e=>{if(e.target===$("authModal"))close()};
+$("authForm").onsubmit=async e=>{e.preventDefault();$("authError").textContent="جارٍ التنفيذ...";try{const payload={email:$("email").value,password:$("password").value};if(mode==="register")payload.username=$("username").value;await api("/api/"+(mode==="login"?"login":"register"),{method:"POST",body:JSON.stringify(payload)});close();$("authForm").reset();await refreshUser()}catch(err){$("authError").textContent=err.message}};
+$("logout").onclick=async()=>{await api("/api/logout",{method:"POST"});await refreshUser()};
+$("postBody").oninput=()=>$("counter").textContent=$("postBody").value.length+" / 500";
+$("publish").onclick=async()=>{ $("postError").textContent="";try{await api("/api/posts",{method:"POST",body:JSON.stringify({body:$("postBody").value})});$("postBody").value="";$("counter").textContent="0 / 500";await loadPosts()}catch(e){$("postError").textContent=e.message}};
+$("refresh").onclick=()=>loadPosts().catch(e=>$("feed").textContent=e.message);
+(async()=>{try{await refreshUser();await loadPosts()}catch(e){$("feed").textContent=e.message}})();
+</script>
+</body></html>
